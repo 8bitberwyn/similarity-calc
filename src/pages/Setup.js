@@ -44,11 +44,6 @@ export default function Setup() {
   const [sports, setSports] = useState([])
   const [hobbies, setHobbies] = useState([])
 
-    // Load existing setup on mount
-  useEffect(() => {
-    loadSetup()
-  }, [])
-
   // Wrap loadSetup in useCallback
   const loadSetup = useCallback(async () => {
     const { data } = await supabase // Removed unused error
@@ -66,6 +61,11 @@ export default function Setup() {
       setHobbies(data.hobbies || [])
     }
   }, [user.id])
+
+    // Load existing setup on mount
+  useEffect(() => {
+    loadSetup()
+  }, [loadSetup])
 
   // Update Big Five trait value
   const updateBigFive = (category, trait, value) => {

@@ -1,3 +1,5 @@
+// src/utils/comparisonLogic.js
+
 // Calculate similarity score between two users
 export function calculateSimilarity(userA, userB) {
   let personalityScore = 0
@@ -5,15 +7,15 @@ export function calculateSimilarity(userA, userB) {
 
   // PERSONALITY (50 points total)
   
-  // MBTI Match (25 points)
+  // MBTI Match (10 points)
   if (userA.mbti_type === userB.mbti_type) {
-    personalityScore += 25
+    personalityScore += 10
   } else if (userA.mbti_type?.slice(0, 4) === userB.mbti_type?.slice(0, 4)) {
     // Same base type, different assertion (-A vs -T)
-    personalityScore += 15
+    personalityScore += 7
   }
 
-  // Big Five Similarity (25 points - 5 per dimension)
+  // Big Five Similarity (40 points - 8 per dimension)
   const dimensions = ['neuroticism', 'extraversion', 'openness', 'agreeableness', 'conscientiousness']
   
   dimensions.forEach(dim => {
@@ -23,7 +25,7 @@ export function calculateSimilarity(userA, userB) {
     // Max difference is 120 (6 traits * 20)
     // Convert to 0-8 scale
     const difference = Math.abs(scoreA - scoreB)
-    const similarity = Math.max(0, 5 - (difference / 120) * 5)
+    const similarity = Math.max(0, 8 - (difference / 120) * 8)
     personalityScore += similarity
   })
 
@@ -31,7 +33,7 @@ export function calculateSimilarity(userA, userB) {
   
   // Sleep similarity (10 points)
   const sleepDiff = Math.abs((userA.sleep_hours || 0) - (userB.sleep_hours || 0))
-  lifestyleScore += Math.max(0, 10 - sleepDiff * 2) // Lose 2 points per hour difference
+  lifestyleScore += Math.max(0, 10 - sleepDiff * 2)
 
   // Pets overlap (15 points)
   lifestyleScore += calculateArrayOverlap(userA.pets, userB.pets, 15)
@@ -64,6 +66,8 @@ function calculateArrayOverlap(arr1 = [], arr2 = [], maxPoints) {
   
   const intersection = [...set1].filter(item => set2.has(item)).length
   const union = new Set([...set1, ...set2]).size
+  
+  if (union === 0) return 0
   
   return (intersection / union) * maxPoints
 }
