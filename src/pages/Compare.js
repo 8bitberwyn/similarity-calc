@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react' // Add useCallback
 import { Container, Form, Button, Alert, Card, Row, Col, Modal } from 'react-bootstrap'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
@@ -18,8 +18,8 @@ export default function Compare() {
   
   // Search inputs
   const [searchUserId, setSearchUserId] = useState('')
-  const [filterType, setFilterType] = useState('both') // personality, lifestyle, both
-  const [sortOrder, setSortOrder] = useState('descending') // ascending, descending
+  const [filterType, setFilterType] = useState('both')
+  const [sortOrder, setSortOrder] = useState('descending')
   const [limitResults, setLimitResults] = useState(10)
   
   // Results
@@ -30,13 +30,9 @@ export default function Compare() {
   const [showModal, setShowModal] = useState(false)
   const [modalData, setModalData] = useState(null)
 
-  // Check if current user has completed setup
-  useEffect(() => {
-    checkUserSetup()
-  }, [])
-
-  const checkUserSetup = async () => {
-    const { data, error } = await supabase
+  // Wrap checkUserSetup in useCallback to stabilize the reference
+  const checkUserSetup = useCallback(async () => {
+    const { data } = await supabase // Removed unused 'error'
       .from('setup_responses')
       .select('*')
       .eq('user_id', user.id)
@@ -48,7 +44,12 @@ export default function Compare() {
     } else {
       setIsSetupComplete(false)
     }
-  }
+  }, [user.id]) // Add user.id as dependency
+
+  // Check if current user has completed setup
+  useEffect(() => {
+    checkUserSetup()
+  }, [checkUserSetup]) // Now checkUserSetup is stable
 
   // Handle direct user ID search
   const handleDirectSearch = async () => {
@@ -140,19 +141,16 @@ export default function Compare() {
       // Filter by section if needed
       let filteredResults = results
       if (filterType === 'personality') {
-        // Sort by personality score only
         filteredResults = results.map(r => ({
           ...r,
           sortScore: r.scores.personalityScore
         }))
       } else if (filterType === 'lifestyle') {
-        // Sort by lifestyle score only
         filteredResults = results.map(r => ({
           ...r,
           sortScore: r.scores.lifestyleScore
         }))
       } else {
-        // Sort by total score
         filteredResults = results.map(r => ({
           ...r,
           sortScore: r.scores.totalScore
@@ -365,7 +363,7 @@ export default function Compare() {
 function ComparisonModal({ show, onHide, data }) {
   if (!data) return null
 
-  const { targetUserId, targetSetup, targetProfile, scores, userSetup } = data
+  const { targetUserId, targetSetup, scores, userSetup } = data // Removed unused targetProfile
 
   return (
     <Modal show={show} onHide={onHide} size="lg">

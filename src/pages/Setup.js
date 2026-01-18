@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Container, Form, Button, Alert } from 'react-bootstrap'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
@@ -44,13 +44,14 @@ export default function Setup() {
   const [sports, setSports] = useState([])
   const [hobbies, setHobbies] = useState([])
 
-  // Load existing setup on mount
+    // Load existing setup on mount
   useEffect(() => {
     loadSetup()
   }, [])
 
-  const loadSetup = async () => {
-    const { data, error } = await supabase
+  // Wrap loadSetup in useCallback
+  const loadSetup = useCallback(async () => {
+    const { data } = await supabase // Removed unused error
       .from('setup_responses')
       .select('*')
       .eq('user_id', user.id)
@@ -64,7 +65,7 @@ export default function Setup() {
       setSports(data.sports || [])
       setHobbies(data.hobbies || [])
     }
-  }
+  }, [user.id])
 
   // Update Big Five trait value
   const updateBigFive = (category, trait, value) => {

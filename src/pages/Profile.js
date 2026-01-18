@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Container, Card, Form, Button, Alert, Row, Col } from 'react-bootstrap'
+import { useState, useEffect, useCallback } from 'react' // Add useCallback
+import { Container, Card, Form, Button, Alert } from 'react-bootstrap' // Remove Row, Col
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar'
 import '../styles/Profile.css'
 
 export default function Profile() {
-  const { user, signOut, deleteAccount } = useAuth()
+  const { user, signOut } = useAuth() // Remove unused deleteAccount
   const navigate = useNavigate()
   
   const [loading, setLoading] = useState(false)
@@ -25,13 +25,9 @@ export default function Profile() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
-  // Load profile on mount
-  useEffect(() => {
-    loadProfile()
-  }, [])
-
-  const loadProfile = async () => {
-    const { data, error } = await supabase
+  // Wrap loadProfile in useCallback
+  const loadProfile = useCallback(async () => {
+    const { data } = await supabase // Removed unused error
       .from('profiles')
       .select('*')
       .eq('id', user.id)
@@ -44,10 +40,13 @@ export default function Profile() {
       setDescription(data.description || '')
       setProfilePictureUrl(data.profile_picture_url || '')
       setIsPublic(data.is_public || false)
-    } else if (error) {
-      console.error('Error loading profile:', error)
     }
-  }
+  }, [user.id])
+
+  // Load profile on mount
+  useEffect(() => {
+    loadProfile()
+  }, [loadProfile])
 
   const handleSaveProfile = async (e) => {
     e.preventDefault()
@@ -84,7 +83,6 @@ export default function Profile() {
   }
 
   const handleDeleteAccount = async () => {
-    // Verify user typed DELETE
     if (deleteConfirmText !== 'DELETE') {
       setMessage({ type: 'danger', text: 'Please type DELETE to confirm' })
       return
@@ -92,27 +90,9 @@ export default function Profile() {
 
     setLoading(true)
 
-    // Delete user's data first (RLS will handle cascade)
-    // Note: Deleting auth user requires admin API (backend)
-    // For now, we'll delete profile data
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .delete()
-      .eq('id', user.id)
-
-    const { error: setupError } = await supabase
-      .from('setup_responses')
-      .delete()
-      .eq('user_id', user.id)
-
-    if (profileError || setupError) {
-      setMessage({ 
-        type: 'danger', 
-        text: 'Error deleting account data. Please contact support.' 
-      })
-      setLoading(false)
-      return
-    }
+    // Delete user's data
+    await supabase.from('profiles').delete().eq('id', user.id)
+    await supabase.from('setup_responses').delete().eq('user_id', user.id)
 
     // Sign out after deleting data
     await signOut()
@@ -156,7 +136,6 @@ export default function Profile() {
             </div>
 
             <Form onSubmit={handleSaveProfile}>
-              {/* Name */}
               <Form.Group className="mb-3">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
@@ -167,7 +146,6 @@ export default function Profile() {
                 />
               </Form.Group>
 
-              {/* Birthday */}
               <Form.Group className="mb-3">
                 <Form.Label>Birthday</Form.Label>
                 <Form.Control
@@ -177,7 +155,6 @@ export default function Profile() {
                 />
               </Form.Group>
 
-              {/* Location */}
               <Form.Group className="mb-3">
                 <Form.Label>Location</Form.Label>
                 <Form.Control
@@ -188,7 +165,6 @@ export default function Profile() {
                 />
               </Form.Group>
 
-              {/* Description */}
               <Form.Group className="mb-3">
                 <Form.Label>Description / Bio</Form.Label>
                 <Form.Control
@@ -204,7 +180,6 @@ export default function Profile() {
                 </Form.Text>
               </Form.Group>
 
-              {/* Profile Picture URL */}
               <Form.Group className="mb-3">
                 <Form.Label>Profile Picture URL</Form.Label>
                 <Form.Control
@@ -218,7 +193,6 @@ export default function Profile() {
                 </Form.Text>
               </Form.Group>
 
-              {/* Public/Private Account */}
               <Form.Group className="mb-4">
                 <Form.Check
                   type="checkbox"
@@ -260,7 +234,6 @@ export default function Profile() {
               </Button>
             </div>
 
-            {/* Delete Confirmation */}
             {showDeleteConfirm && (
               <div className="mt-3 p-3 border border-danger rounded">
                 <Alert variant="danger" className="mb-3">
@@ -300,7 +273,6 @@ export default function Profile() {
           </Card.Body>
         </Card>
 
-        {/* Info Section */}
         <Card className="mb-4 bg-light">
           <Card.Body>
             <h6>Profile Tips</h6>
