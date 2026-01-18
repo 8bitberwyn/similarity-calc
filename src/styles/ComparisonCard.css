@@ -1,0 +1,8 @@
+/* Card specific styles */
+.comparison-card {
+  border-radius: 8px;
+}
+
+.comparison-card .card-body {
+  padding: 1.25rem;
+}
