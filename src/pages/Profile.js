@@ -101,10 +101,33 @@ export default function Profile() {
     }
 
     setLoading(true)
-    await supabase.from('profiles').delete().eq('id', user.id)
-    await supabase.from('setup_responses').delete().eq('user_id', user.id)
-    await signOut()
-    navigate('/login')
+    setMessage({ type: '', text: '' })
+
+    try {
+      // Call the database function to delete account
+      const { error } = await supabase.rpc('delete_own_account')
+
+      if (error) {
+        console.error('Delete error:', error)
+        setMessage({
+          type: 'danger',
+          text: `Failed to delete account: ${error.message}`
+        })
+        setLoading(false)
+        return
+      }
+
+      // Sign out and redirect
+      await signOut()
+      navigate('/login')
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      setMessage({
+        type: 'danger',
+        text: 'An unexpected error occurred. Please try again.'
+      })
+      setLoading(false)
+    }
   }
 
   // Handle file upload for cropping
