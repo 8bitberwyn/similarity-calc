@@ -42,7 +42,7 @@ export default function Navbar() {
     <BSNavbar bg="light" expand="lg">
       <Container>
         <BSNavbar.Brand onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          Similarity Calculator
+          Similitude
         </BSNavbar.Brand>
         <BSNavbar.Toggle aria-controls="basic-navbar-nav" />
         <BSNavbar.Collapse id="basic-navbar-nav">

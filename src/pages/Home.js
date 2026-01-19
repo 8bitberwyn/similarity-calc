@@ -15,18 +15,18 @@ export default function Home() {
         
         <div className="d-flex gap-3 justify-content-center">
           <Button 
-            variant="primary" 
-            size="lg"
-            onClick={() => navigate('/compare')}
-          >
-            Compare
-          </Button>
-          <Button 
             variant="outline-primary" 
             size="lg"
             onClick={() => navigate('/setup')}
           >
             Setup
+          </Button>
+          <Button 
+            variant="primary" 
+            size="lg"
+            onClick={() => navigate('/compare')}
+          >
+            Compare
           </Button>
         </div>
       </Container>

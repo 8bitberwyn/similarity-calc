@@ -75,7 +75,7 @@ export default function Login() {
           Sign in with Google
         </Button>
         
-        <div className="text-center">
+        <div className="text-center text-muted small">
           Need an account? <Link to="/signup">Sign Up</Link>
         </div>
       </div>

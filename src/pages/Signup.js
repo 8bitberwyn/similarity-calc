@@ -39,7 +39,7 @@ export default function Signup() {
   return (
     <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
       <div style={{ maxWidth: '400px', width: '100%' }}>
-        <h2 className="text-center mb-4">Log In</h2>
+        <h2 className="text-center mb-4">Sign Up</h2>
         
         {error && <Alert variant="danger">{error}</Alert>}
         
@@ -65,7 +65,7 @@ export default function Signup() {
           </Form.Group>
           
           <Button variant="primary" type="submit" className="w-100 mb-2" disabled={loading}>
-            Log In
+            Create Account
           </Button>
         </Form>
         
@@ -75,8 +75,8 @@ export default function Signup() {
           Sign in with Google
         </Button>
         
-        <div className="text-center">
-          Need an account? <Link to="/signup">Sign Up</Link>
+        <div className="text-center text-muted small">
+          Already have an account? <Link to="/login">Log In</Link>
         </div>
       </div>
     </Container>

@@ -214,12 +214,11 @@ export default function Compare() {
         
         <Alert variant="info" className="mb-4">
           Please be aware this website is simply a fun little project made to find people who are 
-          similar to yourself. It is not a compatibility test, nor do race, age, etc. have any sway 
-          in the results.
+          similar to yourself. It is not a compatibility test, nor are things like age, location etc accounted for in the results.
         </Alert>
 
         {!isSetupComplete && (
-          <Alert variant="warning">
+          <Alert variant="danger">
             You must complete your setup before comparing with others.{' '}
             <Alert.Link href="/setup">Go to Setup</Alert.Link>
           </Alert>
