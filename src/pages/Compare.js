@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react' // Add useCallback
 import { Container, Form, Button, Alert, Card, Row, Col, Modal } from 'react-bootstrap'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
-import { calculateSimilarity } from '../utils/ComparisonLogic'
+import { calculateSimilarity, getMBTITypeString } from '../utils/ComparisonLogic'
 import Navbar from '../components/Navbar'
 import ComparisonCard from '../components/ComparisonCard'
 import '../styles/Compare.css'
@@ -359,11 +359,10 @@ export default function Compare() {
   )
 }
 
-// Detailed comparison modal component
 function ComparisonModal({ show, onHide, data }) {
   if (!data) return null
 
-  const { targetUserId, targetSetup, scores, userSetup } = data // Removed unused targetProfile
+  const { targetUserId, targetSetup, scores, userSetup } = data
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
@@ -374,10 +373,14 @@ function ComparisonModal({ show, onHide, data }) {
         {/* Score Breakdown */}
         <div className="mb-4">
           <h5>Score Breakdown</h5>
-          <div className="d-flex justify-content-around text-center">
+          <div className="d-flex justify-content-around text-center mb-3">
             <div>
               <h6>Personality</h6>
-              <h3>{scores.personalityScore}/50</h3>
+              <h3>{scores.personalityScore}/100</h3>
+              <small className="text-muted">
+                MBTI: {Math.round(scores.breakdown?.mbti || 0)}/50<br/>
+                Big 5: {Math.round(scores.breakdown?.bigFive || 0)}/50
+              </small>
             </div>
             <div>
               <h6>Lifestyle</h6>
@@ -385,7 +388,7 @@ function ComparisonModal({ show, onHide, data }) {
             </div>
             <div>
               <h6>Total</h6>
-              <h3>{scores.totalScore}/100</h3>
+              <h3>{scores.totalScore}/150</h3>
             </div>
           </div>
         </div>
@@ -394,14 +397,45 @@ function ComparisonModal({ show, onHide, data }) {
 
         {/* MBTI Comparison */}
         <h5>MBTI</h5>
-        <Row className="mb-3">
-          <Col>
-            <strong>You:</strong> {userSetup.mbti_type || 'Not set'}
-          </Col>
-          <Col>
-            <strong>Them:</strong> {targetSetup.mbti_type || 'Not set'}
-          </Col>
-        </Row>
+        <div className="mb-3">
+          <Row>
+            <Col>
+              <strong>You:</strong> {getMBTITypeString(userSetup.mbti)}
+            </Col>
+            <Col>
+              <strong>Them:</strong> {getMBTITypeString(targetSetup.mbti)}
+            </Col>
+          </Row>
+        </div>
+
+        {/* Detailed MBTI Breakdown */}
+        {userSetup.mbti && targetSetup.mbti && (
+          <div className="mb-3">
+            <h6>MBTI Breakdown</h6>
+            {['energy', 'mind', 'nature', 'tactics', 'identity'].map(dim => {
+              const yourMBTI = userSetup.mbti[dim]
+              const theirMBTI = targetSetup.mbti[dim]
+              const match = yourMBTI?.type === theirMBTI?.type
+
+              return (
+                <Row key={dim} className="mb-2 small">
+                  <Col xs={3} className="text-capitalize">{dim}:</Col>
+                  <Col xs={4}>
+                    You: {yourMBTI?.type} ({yourMBTI?.percentage}%)
+                  </Col>
+                  <Col xs={4}>
+                    Them: {theirMBTI?.type} ({theirMBTI?.percentage}%)
+                  </Col>
+                  <Col xs={1}>
+                    {match ? '✓' : '✗'}
+                  </Col>
+                </Row>
+              )
+            })}
+          </div>
+        )}
+
+        <hr />
 
         {/* Big Five Comparison */}
         <h5>Big Five</h5>
