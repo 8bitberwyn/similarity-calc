@@ -6,9 +6,9 @@ export default function ComparisonCard({ userId, profile, scores, onViewDetails 
 
   // Determine score color
   const getScoreColor = (score) => {
-    if (score >= 80) return 'success'
-    if (score >= 60) return 'primary'
-    if (score >= 40) return 'warning'
+    if (score >= 125) return 'success'
+    if (score >= 100) return 'primary'
+    if (score >= 75) return 'warning'
     return 'danger'
   }
 
@@ -46,11 +46,11 @@ export default function ComparisonCard({ userId, profile, scores, onViewDetails 
         <div className="mb-2">
           <div className="d-flex justify-content-between mb-1">
             <span>Total Score</span>
-            <Badge bg={getScoreColor(scores.totalScore)}>{scores.totalScore}/100</Badge>
+            <Badge bg={getScoreColor(scores.totalScore)}>{scores.totalScore}/150</Badge>
           </div>
           <div className="d-flex justify-content-between mb-1">
             <small>Personality</small>
-            <small>{scores.personalityScore}/50</small>
+            <small>{scores.personalityScore}/100</small>
           </div>
           <div className="d-flex justify-content-between">
             <small>Lifestyle</small>

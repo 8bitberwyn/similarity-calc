@@ -189,7 +189,7 @@ export default function Profile() {
                   onChange={(e) => setProfilePictureUrl(e.target.value)}
                 />
                 <Form.Text className="text-muted">
-                  Enter an image URL or leave blank for auto-generated avatar
+                  Enter an image URL or create one <a href="https://www.image2url.com/" target="_blank" rel="noopener noreferrer">here </a>
                 </Form.Text>
               </Form.Group>
 

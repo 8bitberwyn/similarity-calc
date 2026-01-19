@@ -127,7 +127,7 @@ export default function Setup() {
     // Validate Big Five
     const allBigFiveFilled = Object.keys(BIG_FIVE_TRAITS).every(category =>
       BIG_FIVE_TRAITS[category].every(trait => 
-        bigFive[category]?.[trait] !== undefined
+        bigFive[category]?.[trait] !== undefined && bigFive[category]?.[trait] !== ''
       )
     )
 
@@ -137,27 +137,63 @@ export default function Setup() {
       return
     }
 
-    // Save to database
-    const { error } = await supabase
-      .from('setup_responses')
-      .upsert({
-        user_id: user.id,
-        mbti: mbti,
-        big_five: bigFive,
-        sleep_hours: parseFloat(sleepHours),
-        pets,
-        sports,
-        hobbies,
-        is_complete: true,
-        completed_at: new Date().toISOString()
-      })
+    try {
+      // First, check if user already has a setup
+      const { data: existingSetup } = await supabase
+        .from('setup_responses')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
 
-    if (error) {
-      setMessage({ type: 'danger', text: error.message })
-    } else {
-      setMessage({ type: 'success', text: 'Setup saved successfully!' })
+      let result
+
+      if (existingSetup) {
+        // UPDATE existing setup
+        result = await supabase
+          .from('setup_responses')
+          .update({
+            mbti: mbti,
+            big_five: bigFive,
+            sleep_hours: parseFloat(sleepHours),
+            pets,
+            sports,
+            hobbies,
+            is_complete: true,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id)
+      } else {
+        // INSERT new setup
+        result = await supabase
+          .from('setup_responses')
+          .insert({
+            user_id: user.id,
+            mbti: mbti,
+            big_five: bigFive,
+            sleep_hours: parseFloat(sleepHours),
+            pets,
+            sports,
+            hobbies,
+            is_complete: true,
+            completed_at: new Date().toISOString()
+          })
+      }
+
+      if (result.error) {
+        setMessage({ type: 'danger', text: result.error.message })
+      } else {
+        setMessage({ type: 'success', text: '✓ Setup saved successfully!' })
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setMessage({ type: '', text: '' })
+        }, 3000)
+      }
+    } catch (err) {
+      setMessage({ type: 'danger', text: 'An error occurred while saving' })
     }
-    
+
     setLoading(false)
   }
 
@@ -170,8 +206,6 @@ export default function Setup() {
           Please answer ALL questions to the best of your ability. If you're unsure on a particular question, 
           answer as "you" today, or as close to recent times as possible.
         </p>
-
-        {message.text && <Alert variant={message.type}>{message.text}</Alert>}
 
         <Form onSubmit={handleSubmit}>
           {/* PERSONALITY SECTION */}
@@ -221,14 +255,13 @@ export default function Setup() {
                       Percentage: {mbti[dimension.key]?.percentage}%
                     </Form.Label>
                     <Form.Range
-                      min="51"
+                      min="50"
                       max="100"
                       value={mbti[dimension.key]?.percentage || 50}
                       onChange={(e) => updateMBTI(dimension.key, 'percentage', e.target.value)}
                     />
                     <div className="d-flex justify-content-between small text-muted">
-                      <span>51%</span>
-                      <span>75%</span>
+                      <span>50%</span>
                       <span>100%</span>
                     </div>
                   </Form.Group>
@@ -321,6 +354,7 @@ export default function Setup() {
             {loading ? 'Saving...' : 'Save Setup'}
           </Button>
         </Form>
+        {message.text && <Alert variant={message.type}>{message.text}</Alert>}
       </Container>
     </>
   )

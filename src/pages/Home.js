@@ -10,7 +10,7 @@ export default function Home() {
       <Navbar />
       <Container className="text-center mt-5">
         <h1 style={{ fontSize: '3rem', fontWeight: '300', marginBottom: '2rem' }}>
-          Join other people in finding how similar you are to others!
+          Find how similar you are to the other ___ people in the world!
         </h1>
         
         <div className="d-flex gap-3 justify-content-center">

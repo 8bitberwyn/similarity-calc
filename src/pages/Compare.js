@@ -362,12 +362,23 @@ export default function Compare() {
 function ComparisonModal({ show, onHide, data }) {
   if (!data) return null
 
-  const { targetUserId, targetSetup, scores, userSetup } = data
+  const { targetUserId, targetSetup, targetProfile, scores, userSetup } = data
+
+  // Determine display name based on privacy setting
+  const getDisplayName = () => {
+    if (targetProfile?.is_public && targetProfile?.name) {
+      return targetProfile.name
+    }
+    return targetUserId
+  }
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Detailed Comparison with {targetUserId}</Modal.Title>
+        <Modal.Title>Detailed Comparison with {getDisplayName()}
+          {targetProfile?.is_public === false && (
+            <small className="text-muted ms-2">(Private Account)</small>
+          )}</Modal.Title>
       </Modal.Header>
       <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         {/* Score Breakdown */}
