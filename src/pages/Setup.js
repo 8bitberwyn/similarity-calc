@@ -204,7 +204,7 @@ export default function Setup() {
         <h2>Setup Your Profile</h2>
         <p className="text-muted">
           Please answer ALL questions to the best of your ability. If you're unsure on a particular question, 
-          answer as "you" today, or as close to recent times as possible.
+          answer as the "you" of today, or as close to recent times as possible.
         </p>
 
         <Form onSubmit={handleSubmit}>

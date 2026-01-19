@@ -1,28 +1,103 @@
-/* Profile page specific styles */
-.profile-avatar {
-  border: 3px solid #dee2e6;
-  transition: border-color 0.3s;
+/* Profile picture container with hover effect */
+.profile-picture-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  margin-bottom: 1rem;
 }
 
-.profile-avatar:hover {
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.profile-picture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.profile-picture-container:hover .profile-picture-overlay {
+  opacity: 1;
+}
+
+.profile-picture-container:hover .profile-picture {
   border-color: #0d6efd;
 }
+
+/* Avatar editor container */
+.avatar-editor-container {
+  display: inline-block;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom range slider styling */
+.form-range::-webkit-slider-thumb {
+  background: #0d6efd;
+}
+
+.form-range::-moz-range-thumb {
+  background: #0d6efd;
+}
+
+/* Container fixes for perfect alignment */
+.user-id-container button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+}
+
+/* Base icon color */
+.user-id-container i {
+  color: #000000;
+}
+
+.user-id-container i:hover {
+  color: #cacaca; 
+  transition-duration: 0.15s;
+}
+
 
 /* Delete confirmation section */
 .border-danger {
   background-color: #fff5f5;
 }
 
-/* Form spacing */
-.form-group {
-  margin-bottom: 1rem;
-}
-
-/* Card hover effect */
+/* Card transitions */
 .card {
   transition: box-shadow 0.2s;
 }
 
 .card:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal improvements */
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
 }
