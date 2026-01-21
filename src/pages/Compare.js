@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react' // Add useCallback
-import { Container, Form, Button, Alert, Card, Row, Col, Modal } from 'react-bootstrap'
+import { useState, useEffect, useCallback } from 'react'
+import { Container, Form, Button, Alert, Card, Row, Col } from 'react-bootstrap'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
-import { calculateSimilarity, getMBTITypeString } from '../utils/ComparisonLogic'
+import { calculateSimilarity } from '../utils/ComparisonLogic'
 import Navbar from '../components/Navbar'
 import ComparisonCard from '../components/ComparisonCard'
+import ComparisonModal from '../components/ComparisonModal'
 import '../styles/Compare.css'
 
 export default function Compare() {
@@ -14,6 +15,7 @@ export default function Compare() {
   
   // User's setup completeness
   const [userSetup, setUserSetup] = useState(null)
+  const [userProfile, setUserProfile] = useState(null)
   const [isSetupComplete, setIsSetupComplete] = useState(false)
   
   // Search inputs
@@ -30,26 +32,32 @@ export default function Compare() {
   const [showModal, setShowModal] = useState(false)
   const [modalData, setModalData] = useState(null)
 
-  // Wrap checkUserSetup in useCallback to stabilize the reference
+  // Check if current user has completed setup
   const checkUserSetup = useCallback(async () => {
-    const { data } = await supabase // Removed unused 'error'
+    const { data: setupData } = await supabase
       .from('setup_responses')
       .select('*')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
     
-    if (data && data.is_complete) {
-      setUserSetup(data)
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle()
+    
+    if (setupData && setupData.is_complete) {
+      setUserSetup(setupData)
+      setUserProfile(profileData)
       setIsSetupComplete(true)
     } else {
       setIsSetupComplete(false)
     }
-  }, [user.id]) // Add user.id as dependency
+  }, [user.id])
 
-  // Check if current user has completed setup
   useEffect(() => {
     checkUserSetup()
-  }, [checkUserSetup]) // Now checkUserSetup is stable
+  }, [checkUserSetup])
 
   // Handle direct user ID search
   const handleDirectSearch = async () => {
@@ -74,9 +82,16 @@ export default function Compare() {
         .from('setup_responses')
         .select('*')
         .eq('user_id', searchUserId.trim())
-        .single()
+        .maybeSingle()
 
-      if (setupError || !targetSetup) {
+      if (setupError) {
+        console.error('Setup error:', setupError)
+        setError('Error fetching user data')
+        setLoading(false)
+        return
+      }
+
+      if (!targetSetup) {
         setError('User not found or has not completed setup')
         setLoading(false)
         return
@@ -87,7 +102,7 @@ export default function Compare() {
         .from('profiles')
         .select('*')
         .eq('id', searchUserId.trim())
-        .single()
+        .maybeSingle()
 
       // Calculate similarity
       const scores = calculateSimilarity(userSetup, targetSetup)
@@ -100,6 +115,7 @@ export default function Compare() {
       })
 
     } catch (err) {
+      console.error('Search error:', err)
       setError(err.message)
     }
 
@@ -126,7 +142,16 @@ export default function Compare() {
         .eq('is_complete', true)
         .neq('user_id', user.id)
 
-      if (setupError) throw setupError
+      if (setupError) {
+        console.error('Setup error:', setupError)
+        throw setupError
+      }
+
+      if (!allSetups || allSetups.length === 0) {
+        setError('No other users have completed their setup yet')
+        setLoading(false)
+        return
+      }
 
       // Calculate similarities for all users
       const results = allSetups.map(setup => {
@@ -139,23 +164,17 @@ export default function Compare() {
       })
 
       // Filter by section if needed
-      let filteredResults = results
-      if (filterType === 'personality') {
-        filteredResults = results.map(r => ({
-          ...r,
-          sortScore: r.scores.personalityScore
-        }))
-      } else if (filterType === 'lifestyle') {
-        filteredResults = results.map(r => ({
-          ...r,
-          sortScore: r.scores.lifestyleScore
-        }))
-      } else {
-        filteredResults = results.map(r => ({
-          ...r,
-          sortScore: r.scores.totalScore
-        }))
-      }
+      let filteredResults = results.map(r => {
+        let sortScore
+        if (filterType === 'personality') {
+          sortScore = r.scores.personalityScore
+        } else if (filterType === 'lifestyle') {
+          sortScore = r.scores.lifestyleScore
+        } else {
+          sortScore = r.scores.totalScore
+        }
+        return { ...r, sortScore }
+      })
 
       // Sort
       filteredResults.sort((a, b) => {
@@ -178,7 +197,7 @@ export default function Compare() {
 
       // Combine profiles with results
       const finalResults = limitedResults.map(result => {
-        const profile = profiles.find(p => p.id === result.userId)
+        const profile = profiles?.find(p => p.id === result.userId)
         return {
           ...result,
           profile
@@ -188,6 +207,7 @@ export default function Compare() {
       setComparisonResults(finalResults)
 
     } catch (err) {
+      console.error('Filter error:', err)
       setError(err.message)
     }
 
@@ -195,13 +215,14 @@ export default function Compare() {
   }
 
   // Open detailed comparison modal
-  const openComparisonModal = async (targetUserId, targetSetup, targetProfile, scores) => {
+  const openComparisonModal = (targetUserId, targetSetup, targetProfile, scores) => {
     setModalData({
       targetUserId,
       targetSetup,
       targetProfile,
       scores,
-      userSetup
+      userSetup,
+      userProfile
     })
     setShowModal(true)
   }
@@ -214,11 +235,12 @@ export default function Compare() {
         
         <Alert variant="info" className="mb-4">
           Please be aware this website is simply a fun little project made to find people who are 
-          similar to yourself. It is not a compatibility test, nor are things like age, location etc accounted for in the results.
+          similar to yourself. It is not a compatibility test, nor do race, age, etc. have any sway 
+          in the results.
         </Alert>
 
         {!isSetupComplete && (
-          <Alert variant="danger">
+          <Alert variant="warning">
             You must complete your setup before comparing with others.{' '}
             <Alert.Link href="/setup">Go to Setup</Alert.Link>
           </Alert>
@@ -237,6 +259,11 @@ export default function Compare() {
                 value={searchUserId}
                 onChange={(e) => setSearchUserId(e.target.value)}
                 disabled={!isSetupComplete}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleDirectSearch()
+                  }
+                }}
               />
             </Form.Group>
             <Button 
@@ -252,7 +279,7 @@ export default function Compare() {
         {/* FILTER SECTION */}
         <Card className="mb-4">
           <Card.Body>
-            <h5>Filter Results</h5>
+            <h5>Find Matches</h5>
             <Row className="mb-3">
               <Col md={4}>
                 <Form.Group>
@@ -262,8 +289,8 @@ export default function Compare() {
                     onChange={(e) => setSortOrder(e.target.value)}
                     disabled={!isSetupComplete}
                   >
-                    <option value="descending">Descending (Most Similar)</option>
-                    <option value="ascending">Ascending (Least Similar)</option>
+                    <option value="descending">Most Similar First</option>
+                    <option value="ascending">Least Similar First</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -275,7 +302,7 @@ export default function Compare() {
                     onChange={(e) => setFilterType(e.target.value)}
                     disabled={!isSetupComplete}
                   >
-                    <option value="both">Both (Total Score)</option>
+                    <option value="both">Total Score</option>
                     <option value="personality">Personality Only</option>
                     <option value="lifestyle">Lifestyle Only</option>
                   </Form.Select>
@@ -300,7 +327,7 @@ export default function Compare() {
               onClick={handleFilteredSearch}
               disabled={loading || !isSetupComplete}
             >
-              {loading ? 'Loading...' : 'Apply Filters & Search'}
+              {loading ? 'Loading...' : 'Find Matches'}
             </Button>
           </Card.Body>
         </Card>
@@ -355,158 +382,5 @@ export default function Compare() {
         />
       </Container>
     </>
-  )
-}
-
-function ComparisonModal({ show, onHide, data }) {
-  if (!data) return null
-
-  const { targetUserId, targetSetup, targetProfile, scores, userSetup } = data
-
-  // Determine display name based on privacy setting
-  const getDisplayName = () => {
-    if (targetProfile?.is_public && targetProfile?.name) {
-      return targetProfile.name
-    }
-    return targetUserId
-  }
-
-  return (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Detailed Comparison with {getDisplayName()}
-          {targetProfile?.is_public === false && (
-            <small className="text-muted ms-2">(Private Account)</small>
-          )}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        {/* Score Breakdown */}
-        <div className="mb-4">
-          <h5>Score Breakdown</h5>
-          <div className="d-flex justify-content-around text-center mb-3">
-            <div>
-              <h6>Personality</h6>
-              <h3>{scores.personalityScore}/100</h3>
-              <small className="text-muted">
-                MBTI: {Math.round(scores.breakdown?.mbti || 0)}/50<br/>
-                Big 5: {Math.round(scores.breakdown?.bigFive || 0)}/50
-              </small>
-            </div>
-            <div>
-              <h6>Lifestyle</h6>
-              <h3>{scores.lifestyleScore}/50</h3>
-            </div>
-            <div>
-              <h6>Total</h6>
-              <h3>{scores.totalScore}/150</h3>
-            </div>
-          </div>
-        </div>
-
-        <hr />
-
-        {/* MBTI Comparison */}
-        <h5>MBTI</h5>
-        <div className="mb-3">
-          <Row>
-            <Col>
-              <strong>You:</strong> {getMBTITypeString(userSetup.mbti)}
-            </Col>
-            <Col>
-              <strong>Them:</strong> {getMBTITypeString(targetSetup.mbti)}
-            </Col>
-          </Row>
-        </div>
-
-        {/* Detailed MBTI Breakdown */}
-        {userSetup.mbti && targetSetup.mbti && (
-          <div className="mb-3">
-            <h6>MBTI Breakdown</h6>
-            {['energy', 'mind', 'nature', 'tactics', 'identity'].map(dim => {
-              const yourMBTI = userSetup.mbti[dim]
-              const theirMBTI = targetSetup.mbti[dim]
-              const match = yourMBTI?.type === theirMBTI?.type
-
-              return (
-                <Row key={dim} className="mb-2 small">
-                  <Col xs={3} className="text-capitalize">{dim}:</Col>
-                  <Col xs={4}>
-                    You: {yourMBTI?.type} ({yourMBTI?.percentage}%)
-                  </Col>
-                  <Col xs={4}>
-                    Them: {theirMBTI?.type} ({theirMBTI?.percentage}%)
-                  </Col>
-                  <Col xs={1}>
-                    {match ? '✓' : '✗'}
-                  </Col>
-                </Row>
-              )
-            })}
-          </div>
-        )}
-
-        <hr />
-
-        {/* Big Five Comparison */}
-        <h5>Big Five</h5>
-        {['neuroticism', 'extraversion', 'openness', 'agreeableness', 'conscientiousness'].map(dim => {
-          const yourScore = userSetup.big_five?.[dim] 
-            ? Object.values(userSetup.big_five[dim]).reduce((a, b) => a + b, 0) 
-            : 0
-          const theirScore = targetSetup.big_five?.[dim]
-            ? Object.values(targetSetup.big_five[dim]).reduce((a, b) => a + b, 0)
-            : 0
-
-          return (
-            <Row key={dim} className="mb-2">
-              <Col>
-                <strong className="text-capitalize">{dim}:</strong>
-              </Col>
-              <Col>You: {yourScore}</Col>
-              <Col>Them: {theirScore}</Col>
-              <Col>
-                <small className="text-muted">
-                  Diff: {Math.abs(yourScore - theirScore)}
-                </small>
-              </Col>
-            </Row>
-          )
-        })}
-
-        <hr />
-
-        {/* Lifestyle Comparison */}
-        <h5>Lifestyle</h5>
-        
-        <div className="mb-3">
-          <strong>Sleep Hours:</strong>
-          <div>You: {userSetup.sleep_hours || 'Not set'} hours</div>
-          <div>Them: {targetSetup.sleep_hours || 'Not set'} hours</div>
-        </div>
-
-        <div className="mb-3">
-          <strong>Pets:</strong>
-          <div>You: {userSetup.pets?.join(', ') || 'None'}</div>
-          <div>Them: {targetSetup.pets?.join(', ') || 'None'}</div>
-        </div>
-
-        <div className="mb-3">
-          <strong>Sports:</strong>
-          <div>You: {userSetup.sports?.join(', ') || 'None'}</div>
-          <div>Them: {targetSetup.sports?.join(', ') || 'None'}</div>
-        </div>
-
-        <div className="mb-3">
-          <strong>Hobbies:</strong>
-          <div>You: {userSetup.hobbies?.join(', ') || 'None'}</div>
-          <div>Them: {targetSetup.hobbies?.join(', ') || 'None'}</div>
-        </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
   )
 }

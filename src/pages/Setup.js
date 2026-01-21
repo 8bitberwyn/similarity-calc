@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext'
 import ConstrainedSliders from '../components/ConstrainedSliders'
 import Navbar from '../components/Navbar'
 
+import '../styles/Setup.css'
+
 const BIG_FIVE_TRAITS = {
   neuroticism: ['anxiety', 'anger', 'depression', 'self_consciousness', 'immoderation', 'vulnerability'],
   extraversion: ['friendliness', 'gregariousness', 'assertiveness', 'activity_level', 'excitement_seeking', 'cheerfulness'],
@@ -83,14 +85,14 @@ export default function Setup() {
   })
 
   const [lifestyleFunQuestions, setLifestyleFunQuestions] = useState({
-    time_or_money: 2,
-    travel_or_friends: 0,
-    know_future: 1,
-    reborn_gender: 1,
-    fictional_world: 0,
-    lose_sense: 1,
-    afterlife: 0,
-    lifespan: 1,
+    time_or_money: null,
+    travel_or_friends: null,
+    know_future: null,
+    reborn_gender: null,
+    fictional_world: null,
+    lose_sense: null,
+    afterlife: null,
+    lifespan: null,
     lucky_number: '',
     favorite_color: '#000000'
   })
@@ -132,16 +134,16 @@ export default function Setup() {
       })
 
       setLifestyleFunQuestions(data.lifestyle_fun_questions || {
-        time_or_money: 2,
-        travel_or_friends: 0,
-        know_future: 1,
-        reborn_gender: 1,
-        fictional_world: 0,
-        lose_sense: 1,
-        afterlife: 0,
-        lifespan: 1,
-        lucky_number: 7,
-        favorite_color: '#3498db'
+        time_or_money: null,
+        travel_or_friends: null,
+        know_future: null,
+        reborn_gender: null,
+        fictional_world: null,
+        lose_sense: null,
+        afterlife: null,
+        lifespan: null,
+        lucky_number: '',
+        favorite_color: '#000000'
       })
     }
   }, [user.id])
@@ -552,96 +554,366 @@ export default function Setup() {
           <p className="text-muted small">
             Answer these thought-provoking questions honestly
           </p>
-          <Form.Group className="mb-3">
-            <Form.Label>Would you rather:</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.time_or_money}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                time_or_money: parseInt(e.target.value)
-              })}
-              required><option value={0}>Go back in time and be reborn with all current memories</option>
-              <option value={1}>Age 5 years instantly but gain $1 million USD</option>
-              <option value={2}>Stay as you are now</option></Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Would you rather:</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.travel_or_friends}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                travel_or_friends: parseInt(e.target.value)
-              })}
-              required><option value={0}>Travel the world alone for a year</option><option value={1}>Stay home with closest friends for a year</option></Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>If given the choice to know your future exactly, would you take it?</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.know_future}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                know_future: parseInt(e.target.value)
-              })}
-              required><option value={0}>Yes</option><option value={1}>No</option></Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>If given a chance to be reborn as another gender, would you take it?</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.reborn_gender}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                reborn_gender: parseInt(e.target.value)
-              })}
-              required><option value={0}>Yes</option><option value={1}>No</option></Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>If given a chance to be transported to a fictional world of your choosing, would you take it?</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.fictional_world}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                fictional_world: parseInt(e.target.value)
-              })}
-              required><option value={0}>Yes</option><option value={1}>No</option></Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>If you had to lose one of the 5 senses forever, which would you pick?</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.lose_sense}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                lose_sense: parseInt(e.target.value)
-              })}
-              required><option value={0}>Touch</option><option value={1}>Smell</option>
-              <option value={2}>Sound</option>
-              <option value={3}>Sight</option>
-              <option value={4}>Taste</option></Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Which of the following is most appealing if you were to pass away?</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.afterlife}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                afterlife: parseInt(e.target.value)
-              })}
-              required><option value={0}>Everything goes blank, consciousness disappears</option><option value={1}>Spectate the world as a ghost (limited by human travel)</option>
-              <option value={2}>Be reborn as any living being (not human)</option></Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>If you were to be reborn, what age would you want to live to?</Form.Label>
-            <Form.Select
-              value={lifestyleFunQuestions.lifespan}
-              onChange={(e) => setLifestyleFunQuestions({
-                ...lifestyleFunQuestions,
-                lifespan: parseInt(e.target.value)
-              })}
-              required>
-              <option value={0}>50-100 years</option><option value={1}>100-500 years</option>
-              <option value={2}>500+ years</option>
-              <option value={3}>Forever</option>
-            </Form.Select>
-          </Form.Group>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">Would you rather:</Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="time-money-0"
+                name="time_or_money"
+                label="Go back in time and be reborn with all current memories"
+                value={0}
+                checked={lifestyleFunQuestions.time_or_money === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  time_or_money: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="time-money-1"
+                name="time_or_money"
+                label="Age 5 years instantly but gain $1 million USD"
+                value={1}
+                checked={lifestyleFunQuestions.time_or_money === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  time_or_money: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="time-money-2"
+                name="time_or_money"
+                label="Stay as you are now"
+                value={2}
+                checked={lifestyleFunQuestions.time_or_money === 2}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  time_or_money: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">Would you rather:</Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="travel-friends-0"
+                name="travel_or_friends"
+                label="Travel the world alone for a year"
+                value={0}
+                checked={lifestyleFunQuestions.travel_or_friends === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  travel_or_friends: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="travel-friends-1"
+                name="travel_or_friends"
+                label="Stay home with closest friends for a year"
+                value={1}
+                checked={lifestyleFunQuestions.travel_or_friends === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  travel_or_friends: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">
+              If given the choice to know your future exactly, would you take it?
+            </Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="know-future-0"
+                name="know_future"
+                label="Yes"
+                value={0}
+                checked={lifestyleFunQuestions.know_future === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  know_future: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="know-future-1"
+                name="know_future"
+                label="No"
+                value={1}
+                checked={lifestyleFunQuestions.know_future === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  know_future: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">
+              If given a chance to be reborn as another gender, would you take it?
+            </Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="reborn-gender-0"
+                name="reborn_gender"
+                label="Yes"
+                value={0}
+                checked={lifestyleFunQuestions.reborn_gender === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  reborn_gender: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="reborn-gender-1"
+                name="reborn_gender"
+                label="No"
+                value={1}
+                checked={lifestyleFunQuestions.reborn_gender === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  reborn_gender: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">
+              If given a chance to be transported to a fictional world of your choosing, would you take it?
+            </Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="fictional-world-0"
+                name="fictional_world"
+                label="Yes"
+                value={0}
+                checked={lifestyleFunQuestions.fictional_world === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  fictional_world: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="fictional-world-1"
+                name="fictional_world"
+                label="No"
+                value={1}
+                checked={lifestyleFunQuestions.fictional_world === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  fictional_world: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">
+              If you had to lose one of the 5 senses forever, which would you pick?
+            </Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="lose-sense-0"
+                name="lose_sense"
+                label="Touch"
+                value={0}
+                checked={lifestyleFunQuestions.lose_sense === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lose_sense: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="lose-sense-1"
+                name="lose_sense"
+                label="Smell"
+                value={1}
+                checked={lifestyleFunQuestions.lose_sense === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lose_sense: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="lose-sense-2"
+                name="lose_sense"
+                label="Sound"
+                value={2}
+                checked={lifestyleFunQuestions.lose_sense === 2}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lose_sense: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="lose-sense-3"
+                name="lose_sense"
+                label="Sight"
+                value={3}
+                checked={lifestyleFunQuestions.lose_sense === 3}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lose_sense: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="lose-sense-4"
+                name="lose_sense"
+                label="Taste"
+                value={4}
+                checked={lifestyleFunQuestions.lose_sense === 4}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lose_sense: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">
+              Which of the following is most appealing if you were to pass away?
+            </Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="afterlife-0"
+                name="afterlife"
+                label="Everything goes blank, consciousness disappears"
+                value={0}
+                checked={lifestyleFunQuestions.afterlife === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  afterlife: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="afterlife-1"
+                name="afterlife"
+                label="Spectate the world as a ghost (limited by human travel)"
+                value={1}
+                checked={lifestyleFunQuestions.afterlife === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  afterlife: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="afterlife-2"
+                name="afterlife"
+                label="Be reborn as any living being (not human)"
+                value={2}
+                checked={lifestyleFunQuestions.afterlife === 2}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  afterlife: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="fun-question-card">
+            <Form.Label className="fun-question-label">
+              If you were to be reborn, what age would you want to live to?
+            </Form.Label>
+            <div className="radio-group">
+              <Form.Check
+                type="radio"
+                id="lifespan-0"
+                name="lifespan"
+                label="50-100 years"
+                value={0}
+                checked={lifestyleFunQuestions.lifespan === 0}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lifespan: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="lifespan-1"
+                name="lifespan"
+                label="100-500 years"
+                value={1}
+                checked={lifestyleFunQuestions.lifespan === 1}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lifespan: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="lifespan-2"
+                name="lifespan"
+                label="500+ years"
+                value={2}
+                checked={lifestyleFunQuestions.lifespan === 2}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lifespan: parseInt(e.target.value)
+                })}
+                required
+              />
+              <Form.Check
+                type="radio"
+                id="lifespan-3"
+                name="lifespan"
+                label="Forever"
+                value={3}
+                checked={lifestyleFunQuestions.lifespan === 3}
+                onChange={(e) => setLifestyleFunQuestions({
+                  ...lifestyleFunQuestions,
+                  lifespan: parseInt(e.target.value)
+                })}
+                required
+              />
+            </div>
+          </div>
+
           <Form.Group className="mb-3">
             <Form.Label>Pick your lucky number (0-9999)</Form.Label>
             <Form.Control
@@ -651,11 +923,13 @@ export default function Setup() {
               value={lifestyleFunQuestions.lucky_number}
               onChange={(e) => setLifestyleFunQuestions({
                 ...lifestyleFunQuestions,
-                lucky_number: parseInt(e.target.value) || 0
+                lucky_number: parseInt(e.target.value) || ''
               })}
+              placeholder="Enter a number..."
               required
             />
           </Form.Group>
+
           <Form.Group className="mb-4">
             <Form.Label>Pick your favorite color</Form.Label>
             <div className="d-flex align-items-center gap-3">
@@ -675,7 +949,7 @@ export default function Setup() {
                   ...lifestyleFunQuestions,
                   favorite_color: e.target.value
                 })}
-                placeholder="#3498db"
+                placeholder="#000000"
               />
             </div>
           </Form.Group>

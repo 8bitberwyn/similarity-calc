@@ -1,0 +1,57 @@
+/* Fun Questions Styling */
+.fun-question-card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.fun-question-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #212529;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-group .form-check {
+  padding-left: 1.75rem;
+  margin-bottom: 0;
+}
+
+.radio-group .form-check-input {
+  margin-top: 0.25rem;
+  cursor: pointer;
+}
+
+.radio-group .form-check-label {
+  cursor: pointer;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.radio-group .form-check-input:checked ~ .form-check-label {
+  color: #212529;
+  font-weight: 500;
+}
+
+/* MBTI Dimension Cards */
+.mbti-dimension-card {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Constrained Sliders (imported component styling) */
+.constrained-sliders {
+  background-color: #fff;
+}
