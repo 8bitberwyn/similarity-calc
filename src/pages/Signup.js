@@ -14,7 +14,6 @@ export default function Signup() {
   const [userEmail, setUserEmail] = useState('')
   
   const { signUp, signInWithGoogle } = useAuth()
-  const navigate = useNavigate()
 
   // Handle email/password Signup
   const handleSubmit = async (e) => {
