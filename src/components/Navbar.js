@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Navbar as BSNavbar, Container, Nav } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -8,26 +8,24 @@ import '../styles/Navbar.css'
 export default function Navbar() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [profile, setProfile] = useState(null)
 
-  // Fetch user profile on mount
-  useEffect(() => {
-    if (user) {
-      loadProfile()
-    }
-  }, [user])
+  const loadProfile = useCallback(async () => {
+    if (!user) return
 
-  const loadProfile = async () => {
     const { data } = await supabase
       .from('profiles')
       .select('profile_picture_url, name')
       .eq('id', user.id)
       .single()
 
-    if (data) {
-      setProfile(data)
-    }
-  }
+    if (data) setProfile(data)
+  }, [user])
+  const [profile, setProfile] = useState(null)
+  useEffect(() => {
+    loadProfile()
+  }, [loadProfile])
+
+
 
   // Generate avatar URL
   const getAvatarUrl = () => {
