@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Container, Form, Button, Alert, Card } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import '../styles/Auth.css'
