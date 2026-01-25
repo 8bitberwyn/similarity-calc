@@ -1,35 +1,46 @@
 import { useNavigate } from 'react-router-dom'
-import { Container, Button } from 'react-bootstrap'
 import Navbar from '../components/Navbar'
+import '../styles/Home.css'
 
 export default function Home() {
   const navigate = useNavigate()
 
   return (
-    <>
+    <div style={{ height: '100vh', overflow: 'hidden' }}>
       <Navbar />
-      <Container className="text-center mt-5">
-        <h1 style={{ fontSize: '3rem', fontWeight: '300', marginBottom: '2rem' }}>
-          Join other people in finding how similar you are to others!
-        </h1>
+      <div className="home-container">
+        {/* Animated background elements */}
+        <div className="home-bg-circle"></div>
+        <div className="home-bg-circle"></div>
+        <div className="home-bg-circle"></div>
         
-        <div className="d-flex gap-3 justify-content-center">
-          <Button 
-            variant="outline-primary" 
-            size="lg"
-            onClick={() => navigate('/setup')}
-          >
-            Setup
-          </Button>
-          <Button 
-            variant="primary" 
-            size="lg"
-            onClick={() => navigate('/compare')}
-          >
-            Compare
-          </Button>
+        <div className="home-content">
+          <h1 className="home-title">
+            Discover Your Tribe
+          </h1>
+          
+          <p className="home-tagline">
+            Find out who you <span className="home-highlight">truly connect with</span>.
+            <br />
+            Compare personalities, discover similarities, understand what makes you unique.
+          </p>
+          
+          <div className="home-buttons">
+            <button 
+              className="home-btn home-btn-outline"
+              onClick={() => navigate('/setup')}
+            >
+              Get Started
+            </button>
+            <button 
+              className="home-btn home-btn-filled"
+              onClick={() => navigate('/compare')}
+            >
+              Compare Now
+            </button>
+          </div>
         </div>
-      </Container>
-    </>
+      </div>
+    </div>
   )
 }
