@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Container, Form, Button, Alert, Card } from 'react-bootstrap'
+import { Form, Button, Alert, Card } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import '../styles/Auth.css'
 
@@ -45,7 +45,12 @@ export default function Login() {
   }
 
   return (
-    <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+    <div className="auth-page-container">
+      {/* Animated background elements */}
+      <div className="auth-bg-circle"></div>
+      <div className="auth-bg-circle"></div>
+      <div className="auth-bg-circle"></div>
+      
       <Card className="auth-card">
         <Card.Body className="p-4">
           <h2 className="text-center mb-4">Welcome Back</h2>
@@ -125,6 +130,6 @@ export default function Login() {
           </div>
         </Card.Body>
       </Card>
-    </Container>
+    </div>
   )
 }

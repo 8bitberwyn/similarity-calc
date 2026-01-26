@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Container, Form, Button, Alert, Card } from 'react-bootstrap'
+import { Form, Button, Alert, Card } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import '../styles/Auth.css'
 
@@ -64,7 +64,12 @@ export default function Signup() {
   // Show verification message after successful signup
   if (needsVerification) {
     return (
-      <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+      <div className="auth-page-container">
+        {/* Animated background elements */}
+        <div className="auth-bg-circle"></div>
+        <div className="auth-bg-circle"></div>
+        <div className="auth-bg-circle"></div>
+        
         <Card className="auth-card">
           <Card.Body className="text-center p-5">
             <div className="verification-icon mb-4">
@@ -72,7 +77,7 @@ export default function Signup() {
                 xmlns="http://www.w3.org/2000/svg" 
                 width="80" 
                 height="80" 
-                fill="#28a745" 
+                fill="#667eea" 
                 viewBox="0 0 16 16"
               >
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
@@ -117,19 +122,25 @@ export default function Signup() {
                   setPassword('')
                   setConfirmPassword('')
                 }}
+                style={{ color: '#667eea' }}
               >
                 Try signing up again
               </Button>
             </div>
           </Card.Body>
         </Card>
-      </Container>
+      </div>
     )
   }
 
   // Regular signup form
   return (
-    <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
+    <div className="auth-page-container">
+      {/* Animated background elements */}
+      <div className="auth-bg-circle"></div>
+      <div className="auth-bg-circle"></div>
+      <div className="auth-bg-circle"></div>
+      
       <Card className="auth-card">
         <Card.Body className="p-4">
           <h2 className="text-center mb-4">Create Account</h2>
@@ -221,6 +232,6 @@ export default function Signup() {
           </div>
         </Card.Body>
       </Card>
-    </Container>
+    </div>
   )
 }
