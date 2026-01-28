@@ -6,9 +6,9 @@ export default function ComparisonCard({ userId, profile, scores, onViewDetails 
 
   // Determine score color
   const getScoreColor = (score) => {
-    if (score >= 125) return 'success'
-    if (score >= 100) return 'primary'
-    if (score >= 75) return 'warning'
+    if (score >= 150) return 'success'
+    if (score >= 125) return 'primary'
+    if (score >= 100) return 'warning'
     return 'danger'
   }
 
@@ -54,7 +54,7 @@ export default function ComparisonCard({ userId, profile, scores, onViewDetails 
           </div>
           <div className="d-flex justify-content-between">
             <small>Lifestyle</small>
-            <small>{scores.lifestyleScore}/50</small>
+            <small>{scores.lifestyleScore}/100</small>
           </div>
         </div>
 
